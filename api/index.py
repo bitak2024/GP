@@ -1,14 +1,16 @@
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
+import os
 
 app = Flask(__name__)
 
-# Load models
-with open('class_pred.pickle', 'rb') as f:
+file_path = os.path.join(os.path.dirname(__file__), 'class_pred.pickle')
+with open(file_path, 'rb') as f:
     model1 = pickle.load(f)
 
-with open('dt_model.pickle', 'rb') as f:
+file_path = os.path.join(os.path.dirname(__file__), 'class_pred.pickle')
+with open(file_path, 'rb') as f:
     model2 = pickle.load(f)
 
 def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space):
