@@ -23,6 +23,9 @@ def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space):
     except Exception as e:
         print(f"An error occurred during prediction: {e}")
         return None
+@app.route('/')
+def home():
+    return '<h3 style="color: red;">Summary:</h3><p>This Flask app serves a machine learning model to predict apartment prices based on input parameters such as region, number of bedrooms, number of bathrooms, and apartment space. Use the /predict endpoint to get predictions.</p>'
 
 @app.route('/predict', methods=['GET'])
 def predict():
@@ -41,7 +44,9 @@ def predict():
         apartment_space = float(apartment_space)
         predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space)
         if predicted_price is not None:
-            return jsonify({'predicted_price': f'{int(predicted_price):,}'})
+            response = jsonify({'predicted_price': f'{int(predicted_price):,}'})
+            response.headers['Access-Control-Allow-Origin'] = 'https://bitak-bitaks-projects.vercel.app'
+            return response
         else:
             return jsonify({'error': 'Prediction failed'}), 500
     except ValueError:
