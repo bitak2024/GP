@@ -9,7 +9,7 @@ file_path = os.path.join(os.path.dirname(__file__), 'class_pred.pickle')
 with open(file_path, 'rb') as f:
     model1 = pickle.load(f)
 
-file_path = os.path.join(os.path.dirname(__file__), 'class_pred.pickle')
+file_path = os.path.join(os.path.dirname(__file__), 'dt_model.pickle')
 with open(file_path, 'rb') as f:
     model2 = pickle.load(f)
 
