@@ -45,7 +45,9 @@ def predict():
         apartment_space = float(apartment_space)
         predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space)
         if predicted_price is not None:
-            return jsonify({'predicted_price': f'{int(predicted_price):,}'})
+            response = jsonify({'predicted_price': f'{int(predicted_price):,}'})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
         else:
             return jsonify({'error': 'Prediction failed'}), 500
     except ValueError:
@@ -149,6 +151,12 @@ def reset_password():
             return jsonify({'message': 'Password reset successful'})
 
     return jsonify({'error': 'Invalid user data'}), 400
+
+
+@app.after_request
+def add_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 if __name__ == '__main__':
