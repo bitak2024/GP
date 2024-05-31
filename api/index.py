@@ -129,19 +129,6 @@ def login():
     return jsonify({'message': 'Login successful'})
 
 
-@app.route("/delete", methods=["DELETE"])
-def delete():
-    data = request.get_json()
-    user_email = data.get('user_email')
-    user_password = data.get('user_password')
-
-    if not verify_user_credentials(user_email, user_password):
-        return jsonify({
-            'error': 'Invalid credentials'
-        }), 401
-
-    delete_user(user_email)
-    return jsonify({'message': 'User deleted successfully'})
 
 
 @app.route("/password/reset", methods=["PUT"])
