@@ -8,10 +8,10 @@ from passlib.context import CryptContext
 app = Flask(__name__)
 
 # Load models
-with open('./class_pred.pickle', 'rb') as f:
+with open('api/class_pred.pickle', 'rb') as f:
     model1 = pickle.load(f)
 
-with open('./dt_model.pickle', 'rb') as f:
+with open('api/dt_model.pickle', 'rb') as f:
     model2 = pickle.load(f)
 
 
