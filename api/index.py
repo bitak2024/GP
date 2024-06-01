@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pickle
 import numpy as np
 import json
@@ -6,7 +7,7 @@ import os
 from passlib.context import CryptContext
 
 app = Flask(__name__)
-
+CORS(app)
 # Load models
 with open('api/class_pred.pickle', 'rb') as f:
     model1 = pickle.load(f)
