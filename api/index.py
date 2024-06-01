@@ -112,10 +112,14 @@ def register():
     user_phone = data.get('user_phone')
 
     if any(u['user_email'] == user_email for u in read_users()):
-        return jsonify({'error': 'Username already registered'}), 400
+        response= jsonify({'error': 'Username already registered'}), 400
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
     register_user(user_name, user_password, user_email, user_phone)
-    return jsonify({'message': 'Registration successful'})
+    response= jsonify({'message': 'Registration successful'})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @app.route("/login", methods=["POST"])
@@ -125,11 +129,16 @@ def login():
     user_password = data.get('user_password')
 
     if not verify_user_credentials(user_email, user_password):
-        return jsonify({
+        
+        response= jsonify({
             'error': 'Invalid credentials'
         }), 401
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
-    return jsonify({'message': 'Login successful'})
+    response= jsonify({'message': 'Login successful'})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 
