@@ -7,7 +7,8 @@ import os
 from passlib.context import CryptContext
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, allow_headers=["Content-Type"])
+
 # Load models
 with open('api/class_pred.pickle', 'rb') as f:
     model1 = pickle.load(f)
