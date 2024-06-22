@@ -18,11 +18,11 @@ with open('api/dt_model.pickle', 'rb') as f:
 
 
 # Define a function to predict the price
-def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space):
+def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned):
     try:
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned]])
         class_prediction = model1.predict(X_new)[0]
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, class_prediction]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, class_prediction]])
         predicted_price = model2.predict(X_new)[0]
         return predicted_price
     except Exception as e:
@@ -51,7 +51,13 @@ def predict():
         num_of_bedrooms = int(num_of_bedrooms)
         num_of_bathrooms = int(num_of_bathrooms)
         apartment_space = float(apartment_space)
-        predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space)
+        floors = int(num_of_floor)
+        school_Distance = float(school_Distance)
+        clinic_Distance = float(clinic_Distance)	
+        restaurant_Distance = float(restaurant_Distance) 
+        pharmacy_Distance = float(pharmacy_Distance)
+        Air_conditioned = int(Air_conditioned)	
+        predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned)
         if predicted_price is not None:
             response = jsonify({'predicted_price': f'{int(predicted_price):,}'})
             response.headers['Access-Control-Allow-Origin'] = '*'
