@@ -36,6 +36,12 @@ def predict():
     num_of_bedrooms = request.args.get('num_of_bedrooms')
     num_of_bathrooms = request.args.get('num_of_bathrooms')
     apartment_space = request.args.get('apartment_space')
+    floors = request.args.get('floors')
+    school_Distance = request.args.get('school_Distance')
+    clinic_Distance = request.args.get('clinic_Distance')	
+    restaurant_Distance = request.args.get('restaurant_Distance') 
+    pharmacy_Distance = request.args.get('pharmacy_Distance')
+    Air_conditioned = request.args.get('Air_conditioned')	
 
     if not all([region, num_of_bedrooms, num_of_bathrooms, apartment_space]):
         return jsonify({'error': 'Missing input parameters'}), 400
