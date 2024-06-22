@@ -51,7 +51,7 @@ def predict():
         num_of_bedrooms = int(num_of_bedrooms)
         num_of_bathrooms = int(num_of_bathrooms)
         apartment_space = float(apartment_space)
-        floors = int(num_of_floor)
+        floors = int(floors)
         school_Distance = float(school_Distance)
         clinic_Distance = float(clinic_Distance)	
         restaurant_Distance = float(restaurant_Distance) 
