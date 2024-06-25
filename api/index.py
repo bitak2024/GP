@@ -1,3 +1,173 @@
+"""from flask import Flask, request, jsonify
+import pickle
+import numpy as np
+import json
+import os
+from passlib.context import CryptContext
+
+app = Flask(__name__)
+
+# Load models
+with open('class_pred.pickle', 'rb') as f:
+    model1 = pickle.load(f)
+
+with open('dt_model.pickle', 'rb') as f:
+    model2 = pickle.load(f)
+
+
+# Define a function to predict the price
+def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space):
+    try:
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space]])
+        class_prediction = model1.predict(X_new)[0]
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, class_prediction]])
+        predicted_price = model2.predict(X_new)[0]
+        return predicted_price
+    except Exception as e:
+        print(f"An error occurred during prediction: {e}")
+        return None
+
+
+@app.route('/predict', methods=['GET'])
+def predict():
+    region = request.args.get('region')
+    num_of_bedrooms = request.args.get('num_of_bedrooms')
+    num_of_bathrooms = request.args.get('num_of_bathrooms')
+    apartment_space = request.args.get('apartment_space')
+
+    if not all([region, num_of_bedrooms, num_of_bathrooms, apartment_space]):
+        return jsonify({'error': 'Missing input parameters'}), 400
+
+    try:
+        region = int(region)
+        num_of_bedrooms = int(num_of_bedrooms)
+        num_of_bathrooms = int(num_of_bathrooms)
+        apartment_space = float(apartment_space)
+        predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space)
+        if predicted_price is not None:
+            return jsonify({'predicted_price': f'{int(predicted_price):,}'})
+        else:
+            return jsonify({'error': 'Prediction failed'}), 500
+    except ValueError:
+        return jsonify({'error': 'Invalid input types'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# Setup password context
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+USER_DATA_FILE = 'users.json'
+
+
+def read_users():
+    if not os.path.exists(USER_DATA_FILE):
+        return []
+    with open(USER_DATA_FILE, 'r') as f:
+        return json.load(f)
+
+
+def write_users(users):
+    with open(USER_DATA_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
+
+
+def hash_password(password: str):
+    return password_context.hash(password)
+
+
+def verify_user_credentials(user_email: str, user_password: str):
+    users = read_users()
+    user = next((u for u in users if u['user_email'] == user_email), None)
+    if user and password_context.verify(user_password, user['user_password']):
+        return True
+    return False
+
+
+def register_user(user_name: str, user_password: str, user_email: str, user_phone: str):
+    users = read_users()
+    users.append({
+        'user_name': user_name,
+        'user_password': hash_password(user_password),
+        'user_email': user_email,
+        'user_phone': user_phone
+    })
+    write_users(users)
+
+
+def delete_user(user_email: str):
+    users = read_users()
+    users = [user for user in users if user['user_email'] != user_email]
+    write_users(users)
+
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    user_name = data.get('user_name')
+    user_password = data.get('user_password')
+    user_email = data.get('user_email')
+    user_phone = data.get('user_phone')
+
+    if any(u['user_email'] == user_email for u in read_users()):
+        return jsonify({'error': 'Username already registered'}), 400
+
+    register_user(user_name, user_password, user_email, user_phone)
+    return jsonify({'message': 'Registration successful'})
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    user_email = data.get('user_email')
+    user_password = data.get('user_password')
+
+    if not verify_user_credentials(user_email, user_password):
+        return jsonify({
+            'error': 'Invalid credentials'
+        }), 401
+
+    return jsonify({'message': 'Login successful'})
+
+
+@app.route("/delete", methods=["DELETE"])
+def delete():
+    data = request.get_json()
+    user_email = data.get('user_email')
+    user_password = data.get('user_password')
+
+    if not verify_user_credentials(user_email, user_password):
+        return jsonify({
+            'error': 'Invalid credentials'
+        }), 401
+
+    delete_user(user_email)
+    return jsonify({'message': 'User deleted successfully'})
+
+
+@app.route("/password/reset", methods=["PUT"])
+def reset_password():
+    data = request.get_json()
+    user_email = data.get('user_email')
+    new_password = data.get('new_password')
+
+    # Check if user_email and new_password are provided and valid
+    if not (user_email and new_password):
+        return jsonify({'error': 'Invalid user data'}), 400
+
+    users = read_users()
+    for user in users:
+        if user['user_email'] == user_email:
+            user['user_password'] = hash_password(new_password)
+            write_users(users)
+            return jsonify({'message': 'Password reset successful'})
+
+    return jsonify({'error': 'Invalid user data'}), 400
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+"""
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
@@ -10,19 +180,27 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True, allow_headers=["Content-Type"])
 
 # Load models
-with open('api/class_pred.pickle', 'rb') as f:
+# with open('api/class_pred.pickle', 'rb') as f:
+#     model1 = pickle.load(f)
+#
+# with open('api/dt_model.pickle', 'rb') as f:
+#     model2 = pickle.load(f)
+
+with open('class_pred.pickle', 'rb') as f:
     model1 = pickle.load(f)
 
-with open('api/dt_model.pickle', 'rb') as f:
+with open('dt_model.pickle', 'rb') as f:
     model2 = pickle.load(f)
 
-
 # Define a function to predict the price
-def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned):
+def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance,
+                  restaurant_Distance, pharmacy_Distance, Air_conditioned):
     try:
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance,
+                           clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned]])
         class_prediction = model1.predict(X_new)[0]
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, class_prediction]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance,
+                           clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, class_prediction]])
         predicted_price = model2.predict(X_new)[0]
         return predicted_price
     except Exception as e:
@@ -38,10 +216,10 @@ def predict():
     apartment_space = request.args.get('apartment_space')
     floors = request.args.get('floors')
     school_Distance = request.args.get('school_Distance')
-    clinic_Distance = request.args.get('clinic_Distance')	
-    restaurant_Distance = request.args.get('restaurant_Distance') 
+    clinic_Distance = request.args.get('clinic_Distance')
+    restaurant_Distance = request.args.get('restaurant_Distance')
     pharmacy_Distance = request.args.get('pharmacy_Distance')
-    Air_conditioned = request.args.get('Air_conditioned')	
+    Air_conditioned = request.args.get('Air_conditioned')
 
     if not all([region, num_of_bedrooms, num_of_bathrooms, apartment_space]):
         return jsonify({'error': 'Missing input parameters'}), 400
@@ -53,11 +231,13 @@ def predict():
         apartment_space = float(apartment_space)
         floors = int(floors)
         school_Distance = float(school_Distance)
-        clinic_Distance = float(clinic_Distance)	
-        restaurant_Distance = float(restaurant_Distance) 
+        clinic_Distance = float(clinic_Distance)
+        restaurant_Distance = float(restaurant_Distance)
         pharmacy_Distance = float(pharmacy_Distance)
-        Air_conditioned = int(Air_conditioned)	
-        predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned)
+        Air_conditioned = int(Air_conditioned)
+        predicted_price = predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors,
+                                        school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance,
+                                        Air_conditioned)
         if predicted_price is not None:
             response = jsonify({'predicted_price': f'{int(predicted_price):,}'})
             response.headers['Access-Control-Allow-Origin'] = '*'
@@ -125,12 +305,12 @@ def register():
     user_phone = data.get('user_phone')
 
     if any(u['user_email'] == user_email for u in read_users()):
-        response= jsonify({'error': 'Username already registered'}), 400
+        response = jsonify({'error': 'Username already registered'}), 400
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
     register_user(user_name, user_password, user_email, user_phone)
-    response= jsonify({'message': 'Registration successful'})
+    response = jsonify({'message': 'Registration successful'})
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -142,18 +322,13 @@ def login():
     user_password = data.get('user_password')
 
     if not verify_user_credentials(user_email, user_password):
-        
-        response= jsonify({
-            'error': 'Invalid credentials'
-        }), 401
+        response = jsonify({'error': 'Invalid credentials'}), 401
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-    response= jsonify({'message': 'Login successful'})
+    response = jsonify({'message': 'Login successful'})
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
-
-
 
 
 @app.route("/password/reset", methods=["PUT"])
@@ -162,7 +337,6 @@ def reset_password():
     user_email = data.get('user_email')
     new_password = data.get('new_password')
 
-    # Check if user_email and new_password are provided and valid
     if not (user_email and new_password):
         return jsonify({'error': 'Invalid user data'}), 400
 
@@ -174,6 +348,27 @@ def reset_password():
             return jsonify({'message': 'Password reset successful'})
 
     return jsonify({'error': 'Invalid user data'}), 400
+
+
+@app.route("/password/forgot", methods=["POST"])
+def forgot_password():
+    data = request.get_json()
+    user_email = data.get('user_email')
+    new_password = data.get('new_password')
+
+    if not (user_email and new_password):
+        return jsonify({'error': 'Invalid input parameters'}), 400
+
+    users = read_users()
+    user = next((u for u in users if u['user_email'] == user_email), None)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    user['user_password'] = hash_password(new_password)
+    write_users(users)
+
+    return jsonify({'message': 'Password reset successful'})
 
 
 @app.after_request
