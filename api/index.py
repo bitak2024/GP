@@ -18,16 +18,78 @@ with open('api/dt_model.pickle', 'rb') as f:
 
 
 # Define a function to predict the price
+def calcNewPrice(floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, price):
+    # Constants
+    constant_floors = 12000
+    constant_school = 20000
+    constant_clinic = 10000
+    constant_restaurant = 15000
+    constant_pharmacy = 12000
+    
+    # Keys
+    key_floors = 12000
+    key_school = 5.06
+    key_clinic = 3.08
+    key_restaurant = 6.21
+    key_pharmacy = 4.13
+    
+    # Check and update price based on floors
+    if 0 <= floors <= 5:
+        price += floors * key_floors
+    elif floors > 5:
+        price -= constant_floors
+    else:
+        price += constant_floors
+    
+    # Check and update price based on school_Distance
+    if 50 <= school_Distance <= 4000:
+        price += school_Distance * key_school
+    elif school_Distance > 4000:
+        price -= constant_school
+    else:
+        price += constant_school
+    
+    # Check and update price based on clinic_Distance
+    if 50 <= clinic_Distance <= 4000:
+        price += clinic_Distance * key_clinic
+    elif clinic_Distance > 4000:
+        price -= constant_clinic
+    else:
+        price += constant_clinic
+    
+    # Check and update price based on restaurant_Distance
+    if 50 <= restaurant_Distance <= 3000:
+        price += restaurant_Distance * key_restaurant
+    elif restaurant_Distance > 3000:
+        price -= constant_restaurant
+    else:
+        price += constant_restaurant
+    
+    # Check and update price based on pharmacy_Distance
+    if 50 <= pharmacy_Distance <= 2000:
+        price += pharmacy_Distance * key_pharmacy
+    elif pharmacy_Distance > 2000:
+        price -= constant_pharmacy
+    else:
+        price += constant_pharmacy
+    
+    # Check and update price based on Air_conditioned
+    if Air_conditioned == 1:
+        price += 25000
+    
+    return price
+
+
+
 def predict_price(region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance, clinic_Distance,
                   restaurant_Distance, pharmacy_Distance, Air_conditioned):
     try:
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance,
-                           clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space]])
         class_prediction = model1.predict(X_new)[0]
-        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space, floors, school_Distance,
-                           clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, class_prediction]])
+        X_new = np.array([[region, num_of_bedrooms, num_of_bathrooms, apartment_space,class_prediction]])
         predicted_price = model2.predict(X_new)[0]
-        return predicted_price
+        newPrice= calcNewPrice(floors, school_Distance, clinic_Distance, restaurant_Distance, pharmacy_Distance, Air_conditioned, predicted_price)
+        return newPrice
     except Exception as e:
         print(f"An error occurred during prediction: {e}")
         return None
