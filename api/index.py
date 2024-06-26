@@ -10,10 +10,10 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True, allow_headers=["Content-Type"])
 
 # Load models
-with open('api/class_pred.pickle', 'rb') as f:
+with open('api/class_pred5.pickle', 'rb') as f:
     model1 = pickle.load(f)
 
-with open('api/dt_model.pickle', 'rb') as f:
+with open('api/dt_model5.pickle', 'rb') as f:
     model2 = pickle.load(f)
 
 
